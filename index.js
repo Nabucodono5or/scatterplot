@@ -11,8 +11,6 @@ function dataViz(incomingData) {
     element.tweetTime = new Date(element.timestamp);
   });
 
-  console.log(incomingData);
-
   let maxImpact = max(incomingData, (element) => {
     return element.impact;
   });
@@ -28,23 +26,52 @@ function dataViz(incomingData) {
     .domain([0, maxImpact])
     .range(["white", "#990000"]);
 
-  select("svg")
-    .selectAll("circle")
+  //   select("svg")
+  //     .selectAll("circle")
+  //     .data(incomingData)
+  //     .enter()
+  //     .append("circle")
+  //     .attr("r", (d) => {
+  //       return radiusScale(d.impact);
+  //     })
+  //     .attr("cx", (d, i) => {
+  //       return timeRamp(d.tweetTime);
+  //     })
+  //     .attr("cy", (d) => {
+  //       return 500 - yScale(d.impact);
+  //     })
+  //     .style("fill", (d) => {
+  //       return colorScale(d.impact);
+  //     })
+  //     .style("stroke", "black")
+  //     .style("stroke-width", "1px");
+
+  let teamG = select("svg")
+    .selectAll("g")
     .data(incomingData)
     .enter()
+    .append("g")
+    .attr("transform", (d) => {
+      return (
+        "translate (" +
+        timeRamp(d.tweetTime) +
+        "," +
+        (500 - yScale(d.impact)) +
+        ")"
+      );
+    });
+
+  teamG
     .append("circle")
     .attr("r", (d) => {
       return radiusScale(d.impact);
     })
-    .attr("cx", (d, i) => {
-      return timeRamp(d.tweetTime);
-    })
-    .attr("cy", (d) => {
-      return 500 - yScale(d.impact);
-    })
     .style("fill", (d) => {
       return colorScale(d.impact);
     })
-    .style("stroke", "black")
     .style("stroke-width", "1px");
+
+  teamG.append("text").html((d) => {
+    return d.user;
+  });
 }
