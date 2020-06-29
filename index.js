@@ -74,4 +74,12 @@ function dataViz(incomingData) {
   teamG.append("text").html((d) => {
     return d.user;
   });
+
+  selectAll("g").data([1, 2, 3, 4]).exit().remove();
+
+  selectAll("g")
+    .select("text")
+    .text((d) => {
+      return d;
+    });
 }
