@@ -5,26 +5,64 @@ import { scaleLinear, scaleTime } from "d3-scale";
 let tweets = require("./data/tweets.json");
 dataViz(tweets.tweets);
 
-function dataViz(incomingData) {
+function formatarOjetos(incomingData) {
   incomingData.forEach((element) => {
     element.impact = element.favorites.length + element.retweets.length;
     element.tweetTime = new Date(element.timestamp);
   });
 
+  return incomingData;
+}
+
+function medirImpact(incomingData) {
   let maxImpact = max(incomingData, (element) => {
     return element.impact;
   });
 
+  return maxImpact;
+}
+
+function medirData(incomingData) {
   let starEnd = extent(incomingData, (element) => {
     return element.tweetTime;
   });
 
+  return starEnd;
+}
+
+function criandoYScale(maxImpact) {
   let yScale = scaleLinear().domain([0, maxImpact]).range([0, 460]);
+  return yScale;
+}
+
+function criandoRadiusScale(maxImpact) {
   let radiusScale = scaleLinear().domain([0, maxImpact]).range([1, 20]);
+  return radiusScale;
+}
+
+function criandoTimeRamp(starEnd) {
   let timeRamp = scaleTime().domain(starEnd).range([0, 460]);
+  return timeRamp;
+}
+
+function criandoColorScale(maxImpact) {
   let colorScale = scaleLinear()
     .domain([0, maxImpact])
     .range(["white", "#990000"]);
+
+  return colorScale;
+}
+
+function dataViz(incomingData) {
+  incomingData = formatarOjetos(incomingData);
+
+  let maxImpact = medirImpact(incomingData);
+  let starEnd = medirData(incomingData);
+
+  let yScale = criandoYScale(maxImpact);
+  let radiusScale = criandoRadiusScale(maxImpact);
+  let timeRamp = criandoTimeRamp(starEnd);
+  let colorScale = criandoColorScale(maxImpact);
 
   //   select("svg")
   //     .selectAll("circle")
@@ -45,7 +83,6 @@ function dataViz(incomingData) {
   //     })
   //     .style("stroke", "black")
   //     .style("stroke-width", "1px");
-
   let teamG = select("svg")
     .selectAll("g")
     .data(incomingData)
@@ -75,9 +112,13 @@ function dataViz(incomingData) {
     return d.user;
   });
 
-  selectAll("g").data([1, 2, 3, 4]).exit().remove();
+  // testRemoveData("g");
+}
 
-  selectAll("g")
+function testRemoveData(tagRaiz) {
+  selectAll(tagRaiz).data([1, 2, 3, 4]).exit().remove();
+
+  selectAll(tagRaiz)
     .select("text")
     .text((d) => {
       return d;
